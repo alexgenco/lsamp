@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use clap::Parser;
+use clap::{ColorChoice::*, Parser};
 use duration_str::parse as parse_duration;
 use tokio::{
     io::{stdin, stdout, AsyncBufReadExt, AsyncWriteExt, BufReader},
@@ -8,6 +8,7 @@ use tokio::{
 };
 
 #[derive(Parser, Debug)]
+#[clap(version, about = "Sample stdin at a fixed rate", color = Never)]
 struct Opts {
     #[clap(
         short,
