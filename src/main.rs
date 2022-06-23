@@ -8,7 +8,7 @@ use tokio::{
 };
 
 #[derive(Parser, Debug)]
-#[clap(version, about = "Sample stdin at a fixed rate", color = Never)]
+#[clap(version, about, color = Never)]
 struct Opts {
     #[clap(
         short,
