@@ -2,6 +2,7 @@
 name = "lsamp"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
 authors = ["Alex Genco <alexgenco@gmail.com>"]
 description = "Sample stdin at a fixed rate"
 
