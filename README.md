@@ -13,12 +13,12 @@ cargo install lsamp
 ## Usage
 
 ```sh
-# Print 1 log line every second
+# Print 1 line every second
 ... | lsamp
 
-# Print 10 log lines every second
+# Print 10 lines every second
 ... | lsamp --rate 10
 
-# Print 100 log lines every 5.2 seconds
+# Print 100 lines every 5.2 seconds
 ... | lsamp -r 100 --period 5.2s
 ```
