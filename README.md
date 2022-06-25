@@ -2,7 +2,7 @@
 
 Sample stdin at a fixed rate.
 
-For when you have a high volume source (e.g. live application logs) and you just want the gist.
+For when you have a high volume source (e.g. live application logs) but you just want the gist.
 
 ## Installation
 
@@ -10,7 +10,7 @@ For when you have a high volume source (e.g. live application logs) and you just
 cargo install lsamp
 ```
 
-## Usage
+## Examples
 
 ```sh
 # Print 1 line every second
@@ -19,6 +19,6 @@ cargo install lsamp
 # Print 10 lines every second
 ... | lsamp --rate 10
 
-# Print 100 lines every 5.2 seconds
-... | lsamp -r 100 --period 5.2s
+# Print 3 lines every 800 milliseconds
+... | lsamp -r 3 --period 800ms
 ```
