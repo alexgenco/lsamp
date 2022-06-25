@@ -30,20 +30,21 @@ struct Opts {
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn Error>> {
     let opts = Opts::parse();
-    let mut input = BufReader::new(stdin());
+    let mut output = stdout();
+    let mut input = BufReader::new(stdin()).lines();
     let mut tick = interval(parse_duration(&opts.period)?.div_f32(opts.rate));
     tick.set_missed_tick_behavior(MissedTickBehavior::Delay);
 
     loop {
-        let mut buf = String::new();
-
         tokio::select! {
             biased;
             _ = tick.tick() => {
-                input.read_line(&mut buf).await?;
-                stdout().write_all(buf.as_bytes()).await?;
+                let mut buf = String::new();
+
+                input.get_mut().read_line(&mut buf).await?;
+                output.write_all(buf.as_bytes()).await?;
             }
-            _ = input.read_line(&mut buf) => {}
+            _ = input.next_line() => {}
         }
     }
 }
