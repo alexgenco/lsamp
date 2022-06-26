@@ -44,7 +44,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 input.get_mut().read_line(&mut buf).await?;
                 output.write_all(buf.as_bytes()).await?;
             }
-            _ = input.next_line() => {}
+            result = input.next_line() => if result?.is_none() {
+                break
+            }
         }
     }
+
+    Ok(())
 }
