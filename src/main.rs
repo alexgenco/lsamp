@@ -1,33 +1,26 @@
 use std::{
+    env,
     error::Error,
     io::{stdin, stdout, BufRead, Write},
     time::{Duration, Instant},
 };
 
-use clap::{ColorChoice::*, Parser};
-
-#[derive(Parser, Debug)]
-#[clap(version, about, color = Never)]
 struct Opts {
-    #[clap(
-        short,
-        long,
-        default_value = "1",
-        help = "Output rate in lines per period (-p)"
-    )]
     rate: f32,
-
-    #[clap(
-        short,
-        long,
-        default_value = "1s",
-        help = "Time period to apply output rate (-r) to"
-    )]
     period: String,
 }
 
+impl Default for Opts {
+    fn default() -> Self {
+        Self {
+            rate: 1.0,
+            period: String::from("s"),
+        }
+    }
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
-    let opts = Opts::parse();
+    let opts = parse_opts()?;
     let tick = parse_duration(opts.period)?.div_f32(opts.rate);
     let mut output = stdout().lock();
     let mut t0 = Instant::now();
@@ -43,6 +36,32 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     Ok(())
+}
+
+fn parse_opts() -> Result<Opts, Box<dyn Error>> {
+    let mut rate_opt = None;
+    let mut period_opt = None;
+    let mut args = env::args().skip(1);
+
+    loop {
+        match args.next().as_deref() {
+            Some(opt @ "-r" | opt @ "--rate") => rate_opt.replace(
+                args.next()
+                    .ok_or_else(|| format!("Missing required argument to {}", opt))?,
+            ),
+            Some(opt @ "-p" | opt @ "--period") => period_opt.replace(
+                args.next()
+                    .ok_or_else(|| format!("Missing required argument to {}", opt))?,
+            ),
+            Some(opt) => return Err(format!("Unknown option {}", opt).into()),
+            _ => break,
+        };
+    }
+
+    let rate = rate_opt.unwrap_or_else(|| "1.0".to_string()).parse()?;
+    let period = period_opt.unwrap_or_else(|| "1s".to_string());
+
+    Ok(Opts { rate, period })
 }
 
 fn parse_duration(s: String) -> Result<Duration, Box<dyn Error>> {
