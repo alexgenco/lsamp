@@ -10,5 +10,4 @@ description = "Sample stdin at a fixed rate"
 
 [dependencies]
 clap = { version = "3", features = ["derive"] }
-tokio = { version = "1", features = ["macros", "rt", "time", "io-std", "io-util"] }
 duration-str = "0.3.9"

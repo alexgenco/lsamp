@@ -1,11 +1,11 @@
-use std::error::Error;
+use std::{
+    error::Error,
+    io::{stdin, stdout, BufRead, Write},
+    time::Instant,
+};
 
 use clap::{ColorChoice::*, Parser};
 use duration_str::parse as parse_duration;
-use tokio::{
-    io::{stdin, stdout, AsyncBufReadExt, AsyncWriteExt, BufReader},
-    time::{interval, MissedTickBehavior},
-};
 
 #[derive(Parser, Debug)]
 #[clap(version, about, color = Never)]
@@ -13,7 +13,7 @@ struct Opts {
     #[clap(
         short,
         long,
-        default_value = "1.0",
+        default_value = "1",
         help = "Output rate in lines per period (-p)"
     )]
     rate: f32,
@@ -22,31 +22,24 @@ struct Opts {
         short,
         long,
         default_value = "1s",
-        help = "Time period to apply output rate to"
+        help = "Time period to apply output rate (-r) to"
     )]
     period: String,
 }
 
-#[tokio::main(flavor = "current_thread")]
-async fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     let opts = Opts::parse();
-    let mut output = stdout();
-    let mut input = BufReader::new(stdin()).lines();
-    let mut tick = interval(parse_duration(&opts.period)?.div_f32(opts.rate));
-    tick.set_missed_tick_behavior(MissedTickBehavior::Delay);
+    let tick = parse_duration(&opts.period)?.div_f32(opts.rate);
+    let mut output = stdout().lock();
+    let mut t0 = Instant::now();
 
-    loop {
-        tokio::select! {
-            biased;
-            _ = tick.tick() => {
-                let mut buf = String::new();
+    for line in stdin().lock().lines() {
+        if t0.elapsed() >= tick {
+            t0 = Instant::now();
 
-                input.get_mut().read_line(&mut buf).await?;
-                output.write_all(buf.as_bytes()).await?;
-            }
-            result = input.next_line() => if result?.is_none() {
-                break
-            }
+            output.write_all(line?.as_bytes())?;
+            output.write_all(b"\n")?;
+            output.flush()?;
         }
     }
 
