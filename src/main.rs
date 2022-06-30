@@ -10,15 +10,6 @@ struct Opts {
     period: String,
 }
 
-impl Default for Opts {
-    fn default() -> Self {
-        Self {
-            rate: 1.0,
-            period: String::from("s"),
-        }
-    }
-}
-
 fn main() -> Result<(), Box<dyn Error>> {
     let opts = parse_opts()?;
     let tick = parse_duration(opts.period)?.div_f32(opts.rate);
