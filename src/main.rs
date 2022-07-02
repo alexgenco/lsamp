@@ -2,8 +2,17 @@ use std::{
     env,
     error::Error,
     io::{stdin, stdout, BufRead, Write},
+    process::exit,
     time::{Duration, Instant},
 };
+
+const USAGE: &str = r#"Usage: lsamp [options]
+
+Options:
+    -r, --rate    Output rate in lines per period [default: 1]
+    -p, --period  Time period to apply output rate to [default: 1s]
+    -h, --help    Display help
+"#;
 
 struct Opts {
     rate: f32,
@@ -11,7 +20,13 @@ struct Opts {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let opts = parse_opts()?;
+    let opts = match parse_opts() {
+        Ok(opts) => opts,
+        Err(e) => {
+            eprintln!("{}", e);
+            exit(1);
+        }
+    };
     let tick = parse_duration(opts.period)?.div_f32(opts.rate);
     let mut output = stdout().lock();
     let mut t0 = Instant::now();
@@ -38,13 +53,19 @@ fn parse_opts() -> Result<Opts, Box<dyn Error>> {
         match args.next().as_deref() {
             Some(opt @ "-r" | opt @ "--rate") => rate_opt.replace(
                 args.next()
-                    .ok_or_else(|| format!("Missing required argument to {}", opt))?,
+                    .ok_or_else(|| format!("{} requires an argument", opt))?,
             ),
             Some(opt @ "-p" | opt @ "--period") => period_opt.replace(
                 args.next()
-                    .ok_or_else(|| format!("Missing required argument to {}", opt))?,
+                    .ok_or_else(|| format!("{} requires an argument", opt))?,
             ),
-            Some(opt) => return Err(format!("Unknown option {}", opt).into()),
+            Some("-h" | "--help") => {
+                print!("{}", USAGE);
+                exit(0);
+            }
+            Some(opt) => {
+                return Err(format!("Unknown option {:?}.", opt).into());
+            }
             _ => break,
         };
     }
