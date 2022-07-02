@@ -23,7 +23,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let opts = match parse_opts() {
         Ok(opts) => opts,
         Err(e) => {
-            eprintln!("{}", e);
+            eprintln!("lsamp error: {}", e);
             exit(1);
         }
     };
@@ -53,11 +53,11 @@ fn parse_opts() -> Result<Opts, Box<dyn Error>> {
         match args.next().as_deref() {
             Some(opt @ "-r" | opt @ "--rate") => rate_opt.replace(
                 args.next()
-                    .ok_or_else(|| format!("{} requires an argument", opt))?,
+                    .ok_or_else(|| format!("{:?} requires an argument.", opt))?,
             ),
             Some(opt @ "-p" | opt @ "--period") => period_opt.replace(
                 args.next()
-                    .ok_or_else(|| format!("{} requires an argument", opt))?,
+                    .ok_or_else(|| format!("{:?} requires an argument.", opt))?,
             ),
             Some("-h" | "--help") => {
                 print!("{}", USAGE);
