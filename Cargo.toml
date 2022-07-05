@@ -7,3 +7,6 @@ authors = ["Alex Genco <alexgenco@gmail.com>"]
 description = "Sample stdin at a fixed rate"
 
 [dependencies]
+
+[dev-dependencies]
+rand = "*"
