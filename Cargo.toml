@@ -9,4 +9,4 @@ description = "Sample stdin at a fixed rate"
 [dependencies]
 
 [dev-dependencies]
-rand = "*"
+rand = "0.8"
